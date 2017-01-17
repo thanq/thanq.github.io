@@ -1,0 +1,77 @@
+<!doctype html><html class="theme-next mist use-motion" lang=zh-Hans><head><meta charset=UTF-8><meta http-equiv=X-UA-Compatible content="IE=edge"><meta name=viewport content="width=device-width, initial-scale=1, maximum-scale=1"><meta http-equiv=Cache-Control content=no-transform><meta http-equiv=Cache-Control content=no-siteapp><link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel=stylesheet type=text/css><link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel=stylesheet type=text/css><link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel=stylesheet type=text/css><link href="/css/main.css?v=5.1.0" rel=stylesheet type=text/css><meta name=keywords content="Hexo, NexT"><link rel="shortcut icon" type=image/x-icon href="/favicon.ico?v=5.1.0"><meta name=description content="TCP三次握手和四次挥手 为了防止已失效的连接请求报文段突然又传送到了服务端，因而产生错误。 第一次握手：建立连接。客户端发送连接请求报文段，将SYN位置为1，Sequence Number为x；然后，客户端进入SYN_SEND状态，等待服务器的确认； 第二次握手：服务器收到SYN报文段。服务器收到客户端的SYN报文段，需要对这个SYN报文段进行确认，设置Acknowledgment Numbe"><meta property=og:type content=article><meta property=og:title content=三分钟看透TCP三次握手四次挥手><meta property=og:url content=http://www.thanq.me/2017/01/11/tcp_3_time/index.html><meta property=og:site_name content=thanq的日志><meta property=og:description content="TCP三次握手和四次挥手 为了防止已失效的连接请求报文段突然又传送到了服务端，因而产生错误。 第一次握手：建立连接。客户端发送连接请求报文段，将SYN位置为1，Sequence Number为x；然后，客户端进入SYN_SEND状态，等待服务器的确认； 第二次握手：服务器收到SYN报文段。服务器收到客户端的SYN报文段，需要对这个SYN报文段进行确认，设置Acknowledgment Numbe"><meta property=og:updated_time content=2017-01-17T13:42:06.000Z><meta name=twitter:card content=summary><meta name=twitter:title content=三分钟看透TCP三次握手四次挥手><meta name=twitter:description content="TCP三次握手和四次挥手 为了防止已失效的连接请求报文段突然又传送到了服务端，因而产生错误。 第一次握手：建立连接。客户端发送连接请求报文段，将SYN位置为1，Sequence Number为x；然后，客户端进入SYN_SEND状态，等待服务器的确认； 第二次握手：服务器收到SYN报文段。服务器收到客户端的SYN报文段，需要对这个SYN报文段进行确认，设置Acknowledgment Numbe"><script type=text/javascript id=hexo.configurations>
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"always"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '2151426',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script><link rel=canonical href="http://www.thanq.me/2017/01/11/tcp_3_time/"><title>三分钟看透TCP三次握手四次挥手 | thanq的日志</title></head><body itemscope itemtype=http://schema.org/WebPage lang=zh-Hans><div class="container one-collumn sidebar-position-left page-post-detail"><div class=headband></div><header id=header class=header itemscope itemtype=http://schema.org/WPHeader><div class=header-inner><div class=site-meta><div class=custom-logo-site-title><a href="/" class=brand rel=start><span class=logo-line-before><i></i></span> <span class=site-title>thanq的日志</span> <span class=logo-line-after><i></i></span></a></div><p class=site-subtitle></p></div><div class=site-nav-toggle><button><span class=btn-bar></span> <span class=btn-bar></span> <span class=btn-bar></span></button></div><nav class=site-nav><ul id=menu class=menu><li class="menu-item menu-item-home"><a href="/" rel=section><i class="menu-item-icon fa fa-fw fa-home"></i><br>首页</a></li><li class="menu-item menu-item-archives"><a href=/archives rel=section><i class="menu-item-icon fa fa-fw fa-archive"></i><br>归档</a></li><li class="menu-item menu-item-categories"><a href=/categories rel=section><i class="menu-item-icon fa fa-fw fa-th"></i><br>分类</a></li></ul></nav></div></header><main id=main class=main><div class=main-inner><div class=content-wrap><div id=content class=content><div id=posts class=posts-expand><article class="post post-type-normal" itemscope itemtype=http://schema.org/Article><link itemprop=mainEntityOfPage href="http://www.thanq.me/2017/01/11/tcp_3_time/"><span style=display:none itemprop=author itemscope itemtype=http://schema.org/Person><meta itemprop=name content=thanq><meta itemprop=description><meta itemprop=image content="http://s.gravatar.com/avatar/8513d24f7bd53afec6bd74b84242559e?s=215&r=x"></span> <span style=display:none itemprop=publisher itemscope itemtype=http://schema.org/Organization><meta itemprop=name content=thanq的日志><span style=display:none itemprop=logo itemscope itemtype=http://schema.org/ImageObject><img style=display:none; itemprop="url image" alt=thanq的日志></span></span><header class=post-header><h1 class=post-title itemprop="name headline">三分钟看透TCP三次握手四次挥手</h1><div class=post-meta><span class=post-time><span class=post-meta-item-icon><i class="fa fa-calendar-o"></i></span> <span class=post-meta-item-text>发表于</span><time title="Post created" itemprop="dateCreated datePublished" datetime=2017-01-11T18:05:26+08:00>2017-01-11</time></span> <span class=post-category><span class=post-meta-divider>|</span> <span class=post-meta-item-icon><i class="fa fa-folder-o"></i></span> <span class=post-meta-item-text>分类于</span> <span itemprop=about itemscope itemtype=http://schema.org/Thing><a href="/categories/three-minutes/" itemprop=url rel=index><span itemprop=name>three minutes</span></a></span></span> <span class=post-comments-count><span class=post-meta-divider>|</span> <span class=post-meta-item-icon><i class="fa fa-comment-o"></i></span> <a href=/2017/01/11/tcp_3_time/#comments itemprop=discussionUrl><span class="post-comments-count ds-thread-count" data-thread-key="2017/01/11/tcp_3_time/" itemprop=commentCount></span></a></span></div></header><div class=post-body itemprop=articleBody><pre><code>TCP三次握手和四次挥手
+为了防止已失效的连接请求报文段突然又传送到了服务端，因而产生错误。
+
+第一次握手：建立连接。客户端发送连接请求报文段，将SYN位置为1，Sequence Number为x；然后，客户端进入SYN_SEND状态，等待服务器的确认；
+第二次握手：服务器收到SYN报文段。服务器收到客户端的SYN报文段，需要对这个SYN报文段进行确认，设置Acknowledgment Number为x+1(Sequence Number+1)；同时，自己自己还要发送SYN请求信息，将SYN位置为1，Sequence Number为y；服务器端将上述所有信息放到一个报文段（即SYN+ACK报文段）中，一并发送给客户端，此时服务器进入SYN_RECV状态；
+第三次握手：客户端收到服务器的SYN+ACK报文段。然后将Acknowledgment Number设置为y+1，向服务器发送ACK报文段，这个报文段发送完毕以后，客户端和服务器端都进入ESTABLISHED状态，完成TCP三次握手。
+完成了三次握手，客户端和服务器端就可以开始传送数据。以上就是TCP三次握手的总体介绍。
+
+那四次分手呢？
+
+当客户端和服务器通过三次握手建立了TCP连接以后，当数据传送完毕，肯定是要断开TCP连接的啊。那对于TCP的断开连接，这里就有了神秘的“四次分手”。
+
+第一次分手：主机1（可以使客户端，也可以是服务器端），设置Sequence Number和Acknowledgment Number，向主机2发送一个FIN报文段；此时，主机1进入FIN_WAIT_1状态；这表示主机1没有数据要发送给主机2了；
+第二次分手：主机2收到了主机1发送的FIN报文段，向主机1回一个ACK报文段，Acknowledgment Number为Sequence Number加1；主机1进入FIN_WAIT_2状态；主机2告诉主机1，我“同意”你的关闭请求；
+第三次分手：主机2向主机1发送FIN报文段，请求关闭连接，同时主机2进入LAST_ACK状态；
+第四次分手：主机1收到主机2发送的FIN报文段，向主机2发送ACK报文段，然后主机1进入TIME_WAIT状态；主机2收到主机1的ACK报文段以后，就关闭连接；此时，主机1等待2MSL后依然没有收到回复，则证明Server端已正常关闭，那好，主机1也可以关闭连接了。
+至此，TCP的四次分手就这么愉快的完成了。当你看到这里，你的脑子里会有很多的疑问，很多的不懂，感觉很凌乱；没事，我们继续总结。
+
+为什么要三次握手
+
+既然总结了TCP的三次握手，那为什么非要三次呢？怎么觉得两次就可以完成了。那TCP为什么非要进行三次连接呢？在谢希仁的《计算机网络》中是这样说的
+
+为了防止已失效的连接请求报文段突然又传送到了服务端，因而产生错误。
+
+在书中同时举了一个例子，如下：
+
+“已失效的连接请求报文段”的产生在这样一种情况下：client发出的第一个连接请求报文段并没有丢失，而是在某个网络结点长时间的滞留了，以致延误到连接释放以后的某个时间才到达server。本来这是一个早已失效的报文段。但server收到此失效的连接请求报文段后，就误认为是client再次发出的一个新的连接请求。于是就向client发出确认报文段，同意建立连接。假设不采用“三次握手”，那么只要server发出确认，新的连接就建立了。由于现在client并没有发出建立连接的请求，因此不会理睬server的确认，也不会向server发送数据。但server却以为新的运输连接已经建立，并一直等待client发来数据。这样，server的很多资源就白白浪费掉了。采用“三次握手”的办法可以防止上述现象发生。例如刚才那种情况，client不会向server的确认发出确认。server由于收不到确认，就知道client并没有要求建立连接。”
+
+这就很明白了，防止了服务器端的一直等待而浪费资源。
+
+为什么要四次分手
+
+那四次分手又是为何呢？TCP协议是一种面向连接的、可靠的、基于字节流的运输层通信协议。TCP是全双工模式，这就意味着，当主机1发出FIN报文段时，只是表示主机1已经没有数据要发送了，主机1告诉主机2，它的数据已经全部发送完毕了；但是，这个时候主机1还是可以接受来自主机2的数据；当主机2返回ACK报文段时，表示它已经知道主机1没有数据发送了，但是主机2还是可以发送数据到主机1的；当主机2也发送了FIN报文段时，这个时候就表示主机2也没有数据要发送了，就会告诉主机1，我也没有数据要发送了，之后彼此就会愉快的中断这次TCP连接。如果要正确的理解四次分手的原理，就需要了解四次分手过程中的状态变化。
+
+FIN_WAIT_1: 这个状态要好好解释一下，其实FIN_WAIT_1和FIN_WAIT_2状态的真正含义都是表示等待对方的FIN报文。而这两种状态的区别是：FIN_WAIT_1状态实际上是当SOCKET在ESTABLISHED状态时，它想主动关闭连接，向对方发送了FIN报文，此时该SOCKET即进入到FIN_WAIT_1状态。而当对方回应ACK报文后，则进入到FIN_WAIT_2状态，当然在实际的正常情况下，无论对方何种情况下，都应该马上回应ACK报文，所以FIN_WAIT_1状态一般是比较难见到的，而FIN_WAIT_2状态还有时常常可以用netstat看到。（主动方）
+FIN_WAIT_2：上面已经详细解释了这种状态，实际上FIN_WAIT_2状态下的SOCKET，表示半连接，也即有一方要求close连接，但另外还告诉对方，我暂时还有点数据需要传送给你(ACK信息)，稍后再关闭连接。（主动方）
+CLOSE_WAIT：这种状态的含义其实是表示在等待关闭。怎么理解呢？当对方close一个SOCKET后发送FIN报文给自己，你系统毫无疑问地会回应一个ACK报文给对方，此时则进入到CLOSE_WAIT状态。接下来呢，实际上你真正需要考虑的事情是察看你是否还有数据发送给对方，如果没有的话，那么你也就可以 close这个SOCKET，发送FIN报文给对方，也即关闭连接。所以你在CLOSE_WAIT状态下，需要完成的事情是等待你去关闭连接。（被动方）
+LAST_ACK: 这个状态还是比较容易好理解的，它是被动关闭一方在发送FIN报文后，最后等待对方的ACK报文。当收到ACK报文后，也即可以进入到CLOSED可用状态了。（被动方）
+TIME_WAIT: 表示收到了对方的FIN报文，并发送出了ACK报文，就等2MSL后即可回到CLOSED可用状态了。如果FINWAIT1状态下，收到了对方同时带FIN标志和ACK标志的报文时，可以直接进入到TIME_WAIT状态，而无须经过FIN_WAIT_2状态。（主动方）
+CLOSED: 表示连接中断。
+</code></pre></div><div></div><div></div><footer class=post-footer><div class=post-nav><div class="post-nav-next post-nav-item"><a href="/2017/01/11/know_保险丝算法_in_three_minutes/" rel=next title=3分钟掌握解服务治理领域的熔断保护算法><i class="fa fa-chevron-left"></i> 3分钟掌握解服务治理领域的熔断保护算法</a></div><span class=post-nav-divider></span><div class="post-nav-prev post-nav-item"><a href="/2017/01/11/performance_optimize/" rel=prev title=程序性能优化的套路>程序性能优化的套路 <i class="fa fa-chevron-right"></i></a></div></div></footer></article><div class=post-spread></div></div></div><div class=comments id=comments><div class=ds-thread data-thread-key="2017/01/11/tcp_3_time/" data-title=三分钟看透TCP三次握手四次挥手 data-url="http://www.thanq.me/2017/01/11/tcp_3_time/"></div></div></div><div class=sidebar-toggle><div class=sidebar-toggle-line-wrap><span class="sidebar-toggle-line sidebar-toggle-line-first"></span> <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span> <span class="sidebar-toggle-line sidebar-toggle-line-last"></span></div></div><aside id=sidebar class=sidebar><div class=sidebar-inner><section class="site-overview sidebar-panel sidebar-panel-active"><div class="site-author motion-element" itemprop=author itemscope itemtype=http://schema.org/Person><img class=site-author-image itemprop=image src="http://s.gravatar.com/avatar/8513d24f7bd53afec6bd74b84242559e?s=215&r=x" alt=thanq><p class=site-author-name itemprop=name>thanq</p><p class="site-description motion-element" itemprop=description>make it better</p></div><nav class="site-state motion-element"><div class="site-state-item site-state-posts"><a href=/archives><span class=site-state-item-count>11</span> <span class=site-state-item-name>日志</span></a></div><div class="site-state-item site-state-categories"><a href=/categories><span class=site-state-item-count>2</span> <span class=site-state-item-name>分类</span></a></div></nav><div class="links-of-author motion-element"><span class=links-of-author-item><a href=https://www.weibo.com/thanq target=_blank title=weibo><i class="fa fa-fw fa-globe"></i> weibo</a></span> <span class=links-of-author-item><a href=https://github.com/thanq target=_blank title=GitHub><i class="fa fa-fw fa-github"></i> GitHub</a></span></div></section></div></aside></div></main><footer id=footer class=footer><div class=footer-inner><div class=copyright>&copy; <span itemprop=copyrightYear>2017</span> <span class=with-love><i class="fa fa-heart"></i></span> <span class=author itemprop=copyrightHolder>thanq</span></div><div class=powered-by>由 <a class=theme-link href=https://hexo.io>Hexo</a> 强力驱动</div><div class=theme-info>主题 - <a class=theme-link href=https://github.com/iissnan/hexo-theme-next>NexT.Mist</a></div></div></footer><div class=back-to-top><i class="fa fa-arrow-up"></i></div></div><script type=text/javascript>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script><script type=text/javascript src="/lib/jquery/index.js?v=2.1.3"></script><script type=text/javascript src="/lib/concat.js?v=2.1.3"></script><script type=text/javascript src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script><script type=text/javascript src="/js/src/utils.js?v=5.1.0"></script><script type=text/javascript src="/js/src/motion.js?v=5.1.0"></script><script type=text/javascript src="/js/src/scrollspy.js?v=5.1.0"></script><script type=text/javascript src="/js/src/post-details.js?v=5.1.0"></script><script type=text/javascript src="/js/src/bootstrap.js?v=5.1.0"></script><script type=text/javascript>
+    var duoshuoQuery = {short_name:"thanq"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (
+document.getElementById('footer') || document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script><script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script><script src="/js/src/hook-duoshuo.js?v=5.1.0"></script><script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script></body></html>
